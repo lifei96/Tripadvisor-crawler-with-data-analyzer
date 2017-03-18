@@ -23,15 +23,12 @@ def mark_failed_review(review_id):
     failed_review_list.append(review_id)
 
 
-def crawl(city_id, city_name, hotel_id, url):
+def crawl(driver, driver2, driver3, city_id, city_name, hotel_id, url):
     with open('./geocoding_key.txt', 'r') as f:
         Keys = f.read().split('\n')
     while '' in Keys:
         Keys.remove('')
     print (city_name + ' ' + city_id + ' ' + hotel_id)
-    driver = webdriver.Chrome(executable_path='./chromedriver')
-    driver2 = webdriver.Chrome(executable_path='./chromedriver')
-    driver3 = webdriver.Chrome(executable_path='./chromedriver')
     try:
         driver.get(url)
         time.sleep(5)
@@ -42,9 +39,6 @@ def crawl(city_id, city_name, hotel_id, url):
         mark_failed(city_id, city_name, hotel_id)
         print('-----failed to get url')
         print('-----marked')
-        driver.quit()
-        driver2.quit()
-        driver3.quit()
         return
     try:
         driver.find_element_by_xpath("//*[@class='ui_close_x']").click()
@@ -186,9 +180,6 @@ def crawl(city_id, city_name, hotel_id, url):
             mark_failed(city_id, city_name, hotel_id)
             print('-----failed to click More')
             print('-----marked')
-            driver.quit()
-            driver2.quit()
-            driver3.quit()
             return
         try:
             all_reviews = driver.find_elements_by_xpath("//*[@class='reviewSelector']")
@@ -298,12 +289,15 @@ def crawl(city_id, city_name, hotel_id, url):
                                 time.sleep(2)
                                 locale.setlocale(locale.LC_ALL, 'en_US.UTF8')
                                 user_data['income'] = locale.atoi(driver2.find_element_by_xpath("//*[@class='value']").text.replace(' ', ''))
+                                print (user_data['income'])
                             except Exception as inst:
                                 print type(inst)
                                 print inst.args
                                 print inst
                                 print('-----failed to get income')
                                 user_data['income'] = ''
+                        else:
+                            user_data['income'] = ''
                 else:
                     user_data['location'] = ''
                     user_data['country'] = ''
@@ -360,9 +354,6 @@ def crawl(city_id, city_name, hotel_id, url):
     with open('./Data/Hotels/' + hotel_id + '.json', 'w') as f:
         f.write(json.dumps(hotel_data, indent=4))
     time.sleep(6)
-    driver.quit()
-    driver2.quit()
-    driver3.quit()
 
 
 if __name__ == '__main__':
@@ -375,13 +366,19 @@ if __name__ == '__main__':
         cities_list = list()
         for city in cities_info:
             cities_list.append(city.split(' '))
+    driver = webdriver.Chrome(executable_path='./chromedriver')
+    driver2 = webdriver.Chrome(executable_path='./chromedriver')
+    driver3 = webdriver.Chrome(executable_path='./chromedriver')
     for city in cities_list:
         with open('./Data/Cities/' + city[0] + '-' + city[1] + '.txt', 'r') as f:
             hotels_info = json.loads(f.read())
         for hotel_id in hotels_info["hotels_list"]:
             if os.path.exists('./Data/Hotels/' + hotel_id + '.json'):
                 continue
-            crawl(city[1], city[0], hotel_id, 'https://www.tripadvisor.com/Hotel_Review-g' + city[1] + '-d' + hotel_id + '-Reviews')
+            crawl(driver, driver2, driver3, city[1], city[0], hotel_id, 'https://www.tripadvisor.com/Hotel_Review-g' + city[1] + '-d' + hotel_id + '-Reviews')
+    driver.quit()
+    driver2.quit()
+    driver3.quit()
     with open('./Data/cities_failed_list.txt', 'w') as f:
         f.write('\n'.join(failed_list))
     with open('./Data/reviews_failed_list.txt', 'w') as f:
