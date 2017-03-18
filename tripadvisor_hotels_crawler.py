@@ -29,9 +29,9 @@ def crawl(city_id, city_name, hotel_id, url):
     while '' in Keys:
         Keys.remove('')
     print (city_name + ' ' + city_id + ' ' + hotel_id)
-    driver = webdriver.Firefox()
-    driver2 = webdriver.Firefox()
-    driver3 = webdriver.Firefox()
+    driver = webdriver.Chrome(executable_path='./chromedriver')
+    driver2 = webdriver.Chrome(executable_path='./chromedriver')
+    driver3 = webdriver.Chrome(executable_path='./chromedriver')
     try:
         driver2.get('https://factfinder.census.gov/faces/nav/jsf/pages/community_facts.xhtml')
     except Exception as inst:
@@ -118,7 +118,7 @@ def crawl(city_id, city_name, hotel_id, url):
     except:
         hotel_data['green_leader'] = ''
     try:
-        street_address = hotel_header.find_element_by_xpath(".//*[@property='reviewCount']").text
+        street_address = hotel_header.find_element_by_xpath(".//*[@property='streetAddress']").text
         hotel_data['street_address'] = street_address
     except:
         hotel_data['street_address'] = ''
@@ -144,7 +144,7 @@ def crawl(city_id, city_name, hotel_id, url):
     except:
         hotel_data['class'] = ''
     try:
-        hotel_tags = property_tags.find_elements_by_xpath(".//*[@class'tag']")
+        hotel_tags = property_tags.find_elements_by_xpath(".//*[@class='tag']")
         tags = list()
         for tag in hotel_tags:
             tags.append(tag.text)
