@@ -1,5 +1,6 @@
 Data/
 chromedriver
+geocoding_key.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
