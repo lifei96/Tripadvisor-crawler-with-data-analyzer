@@ -33,18 +33,6 @@ def crawl(city_id, city_name, hotel_id, url):
     driver2 = webdriver.Chrome(executable_path='./chromedriver')
     driver3 = webdriver.Chrome(executable_path='./chromedriver')
     try:
-        driver2.get('https://factfinder.census.gov/faces/nav/jsf/pages/community_facts.xhtml')
-    except Exception as inst:
-        print type(inst)
-        print inst.args
-        print inst
-        print('-----failed to get census url')
-        driver.quit()
-        driver2.quit()
-        driver3.quit()
-        return
-    time.sleep(3)
-    try:
         driver.get(url)
         time.sleep(5)
     except Exception as inst:
@@ -161,13 +149,14 @@ def crawl(city_id, city_name, hotel_id, url):
                 print('-----no x')
             while True:
                 More = driver.find_elements_by_xpath("//*[@class='taLnk ulBlueLinks']")
+                time.sleep(2)
                 try:
                     time.sleep(2)
                     driver.find_element_by_xpath("//*[@class='ui_close_x']").click()
                 except:
                     print('-----no x')
-                time.sleep(1)
                 if More and More[0].text[0] == 'M':
+                    time.sleep(1)
                     More[0].click()
                     print('-----clicked More')
                     break
@@ -242,6 +231,7 @@ def crawl(city_id, city_name, hotel_id, url):
                     num = random.randint(0, len(Keys) - 1)
                     while True:
                         try:
+                            print (user_data['location'])
                             geo = geocoder.google(user_data['location'], key=Keys[num])
                             break
                         except Exception as inst:
@@ -265,10 +255,13 @@ def crawl(city_id, city_name, hotel_id, url):
                         user_data['zipcode'] = geo.postal
                         if user_data['country'] == 'US':
                             try:
+                                driver2.get('https://factfinder.census.gov/faces/nav/jsf/pages/community_facts.xhtml')
+                                time.sleep(2)
                                 try:
                                     driver2.find_element_by_xpath("//*[@class='fsrCloseBtn']").click()
                                 except:
                                     print('no x')
+                                time.sleep(1)
                                 driver2.find_element_by_xpath("//*[@id='cfsearchtextbox']").send_keys(user_data['location'])
                                 time.sleep(1)
                                 driver2.find_element_by_xpath("//*[@class='autoCompleteGoButton']").click()
