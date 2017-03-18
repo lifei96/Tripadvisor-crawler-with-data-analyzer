@@ -139,9 +139,18 @@ def crawl(city_id, city_name, hotel_id, url):
         hotel_data['tags'] = tags
     except:
         hotel_data['tags'] = list()
+    page_num_list = driver.find_elements_by_xpath("//*[@class='pageNum taLnk']")
+    page_num = 1
+    for page_num_item in page_num_list:
+        page_num_int = int(page_num_item.get_attribute("data-page-number"))
+        if page_num_int > page_num:
+            page_num = page_num_int
     reviews_list = list()
-    while True:
+    for page_num_int in range(page_num):
         try:
+            print('-----page ' + str(page_num_int))
+            driver.get('https://www.tripadvisor.com/Hotel_Review-g' + city_id + '-d' + hotel_id + '-Reviews-or' + str(page_num_int) + '0')
+            time.sleep(5)
             try:
                 time.sleep(2)
                 driver.find_element_by_xpath("//*[@class='ui_close_x']").click()
@@ -156,10 +165,17 @@ def crawl(city_id, city_name, hotel_id, url):
                 except:
                     print('-----no x')
                 if More and More[0].text[0] == 'M':
-                    time.sleep(1)
-                    More[0].click()
-                    print('-----clicked More')
-                    break
+                    try:
+                        time.sleep(1)
+                        More[0].click()
+                        print('-----clicked More')
+                        break
+                    except:
+                        try:
+                            time.sleep(2)
+                            driver.find_element_by_xpath("//*[@class='ui_close_x']").click()
+                        except:
+                            print('-----no x')
                 else:
                     break
             time.sleep(5)
@@ -244,10 +260,10 @@ def crawl(city_id, city_name, hotel_id, url):
                     if geo.json['status'] != "OK":
                         print('-----failed to get geo')
                         user_data['income'] = ''
-                        user_data['country'] = geo.country
-                        user_data['state'] = geo.state
-                        user_data['city'] = geo.city
-                        user_data['zipcode'] = geo.postal
+                        user_data['country'] = ''
+                        user_data['state'] = ''
+                        user_data['city'] = ''
+                        user_data['zipcode'] = ''
                     else:
                         user_data['country'] = geo.country
                         user_data['state'] = geo.state
@@ -303,44 +319,43 @@ def crawl(city_id, city_name, hotel_id, url):
                         break
                 if not flag:
                     user_data['level'] = ''
-                reviews_count = user.find_elements_by_xpath(".//*[@class='reviewerBadge badge']")
-                if reviews_count:
-                    user_data['reviews_count'] = int(user.find_element_by_xpath(".//*[@class='badgeText']").text.split()[0])
-                else:
-                    user_data['reviews_count'] = ''
-                hotel_reviews = user.find_elements_by_xpath(".//*[@class='contributionReviewBadge badge']")
-                if hotel_reviews:
-                    user_data['hotel_reviews'] = int(user.find_element_by_xpath(".//*[@class='badgeText']").text.split()[0])
-                else:
-                    user_data['hotel_reviews'] = ''
-                helpful_votes = user.find_elements_by_xpath(".//*[@class='helpfulVotesBadge badge']")
-                if helpful_votes:
-                    user_data['helpful_votes'] = int(user.find_element_by_xpath(".//*[@class='badgeText']").text.split()[0])
-                else:
-                    user_data['helpful_votes'] = ''
+                try:
+                    reviews_count = user.find_elements_by_xpath(".//*[@class='reviewerBadge badge']")
+                    if reviews_count:
+                        reviews_count_str = reviews_count[0].find_element_by_xpath(".//*[@class='badgeText']").text
+                        print (reviews_count_str.split())
+                        user_data['reviews_count'] = int(reviews_count_str.split()[0])
+                    else:
+                        user_data['reviews_count'] = ''
+                    hotel_reviews = user.find_elements_by_xpath(".//*[@class='contributionReviewBadge badge']")
+                    if hotel_reviews:
+                        hotel_reviews_str = hotel_reviews[0].find_element_by_xpath(".//*[@class='badgeText']").text
+                        print (hotel_reviews_str.split())
+                        user_data['hotel_reviews'] = int(hotel_reviews_str.split()[0])
+                    else:
+                        user_data['hotel_reviews'] = ''
+                    helpful_votes = user.find_elements_by_xpath(".//*[@class='helpfulVotesBadge badge']")
+                    if helpful_votes:
+                        helpful_votes_str = helpful_votes[0].find_element_by_xpath(".//*[@class='badgeText']").text
+                        print (helpful_votes_str.split())
+                        user_data['helpful_votes'] = int(helpful_votes_str.split()[0])
+                    else:
+                        user_data['helpful_votes'] = ''
+                except Exception as inst:
+                    print type(inst)
+                    print inst.args
+                    print inst
+                    print ("-----failed to get badges")
             except Exception as inst:
                 print type(inst)
                 print inst.args
                 print inst
                 mark_failed_review(review_id)
                 print ("-----failed to retrieve review " + review_id)
+                continue
             review_data['user'] = user_data
             with open('./Data/Reviews/' + review_id + '.json', 'w') as f:
                 f.write(json.dumps(review_data, indent=4))
-        try:
-            next_page = driver.find_element_by_xpath("//*[@class='nav next rndBtn ui_button primary taLnk']").get_attribute("href")
-            driver.get(next_page)
-            time.sleep(6)
-        except Exception as inst:
-            print type(inst)
-            print inst.args
-            print inst
-            print('-----failed to click next page')
-            break
-        try:
-            driver.find_element_by_xpath("//*[@class='ui_close_x']").click()
-        except:
-            print('-----no x')
     hotel_data['reviews_list'] = reviews_list
     with open('./Data/Hotels/' + hotel_id + '.json', 'w') as f:
         f.write(json.dumps(hotel_data, indent=4))
