@@ -199,6 +199,9 @@ def crawl(driver, driver2, driver3, city_id, city_name, hotels_id_list):
                 try:
                     review_id = review.get_attribute("data-reviewId")
                     reviews_list.append(review_id)
+                    if os.path.exists('./Data/Reviews/' + review_id + '.json'):
+                        print ('-----review exists')
+                        continue
                     review_data['review_id'] = review_id
                     review_title = review.find_elements_by_xpath(".//*[@class='noQuotes']")
                     if review_title:
