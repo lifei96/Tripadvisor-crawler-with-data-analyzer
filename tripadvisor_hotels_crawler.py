@@ -24,6 +24,7 @@ def mark_failed_review(review_id):
 
 
 def crawl(driver, driver2, driver3, city_id, city_name, hotels_id_list):
+    locale.setlocale(locale.LC_ALL, 'en_US.UTF8')
     for hotel_id in hotels_id_list:
         if os.path.exists('./Data/Hotels/' + hotel_id + '.json'):
             continue
@@ -67,7 +68,7 @@ def crawl(driver, driver2, driver3, city_id, city_name, hotels_id_list):
             print ('no google rating')
         try:
             price = driver3.find_elements_by_xpath("//*[@class='_V0p']")
-            hotel_data['price'] = int(price[0].text[1:])
+            hotel_data['price'] = locale.atoi(price[0].text[1:])
             print (hotel_data['price'])
         except:
             hotel_data['price'] = ''
@@ -79,12 +80,12 @@ def crawl(driver, driver2, driver3, city_id, city_name, hotels_id_list):
         except:
             hotel_data['rating'] = ''
         try:
-            rank = int(hotel_header.find_element_by_xpath(".//*[@class='rank']").text[1:])
+            rank = locale.atoi(hotel_header.find_element_by_xpath(".//*[@class='rank']").text[1:])
             hotel_data['rank'] = rank
         except:
             hotel_data['rank'] = ''
         try:
-            reviews_count = int(hotel_header.find_element_by_xpath(".//*[@property='reviewCount']").get_attribute('content'))
+            reviews_count = locale.atoi(hotel_header.find_element_by_xpath(".//*[@property='reviewCount']").get_attribute('content'))
             hotel_data['reviews_count'] = reviews_count
         except:
             hotel_data['reviews_count'] = ''
@@ -126,7 +127,7 @@ def crawl(driver, driver2, driver3, city_id, city_name, hotels_id_list):
         property_tags = driver.find_element_by_xpath("//*[@class='property_tags_wrap ']")
         try:
             hotel_class = property_tags.find_element_by_xpath(".//*[@title='Hotel class']").get_attribute("class")
-            hotel_data['class'] = int(hotel_class[-2:-1])
+            hotel_data['class'] = locale.atoi(hotel_class[-2:-1])
         except:
             hotel_data['class'] = ''
         try:
@@ -140,7 +141,7 @@ def crawl(driver, driver2, driver3, city_id, city_name, hotels_id_list):
         page_num_list = driver.find_elements_by_xpath("//*[@class='pageNum taLnk']")
         page_num = 1
         for page_num_item in page_num_list:
-            page_num_int = int(page_num_item.get_attribute("data-page-number"))
+            page_num_int = locale.atoi(page_num_item.get_attribute("data-page-number"))
             if page_num_int > page_num:
                 page_num = page_num_int
         reviews_list = list()
@@ -291,7 +292,6 @@ def crawl(driver, driver2, driver3, city_id, city_name, hotels_id_list):
                                     except:
                                         print('no x')
                                     time.sleep(2)
-                                    locale.setlocale(locale.LC_ALL, 'en_US.UTF8')
                                     user_data['income'] = locale.atoi(driver2.find_element_by_xpath("//*[@class='value']").text.replace(' ', ''))
                                     print (user_data['income'])
                                 except Exception as inst:
@@ -322,21 +322,21 @@ def crawl(driver, driver2, driver3, city_id, city_name, hotels_id_list):
                         if reviews_count:
                             reviews_count_str = reviews_count[0].find_element_by_xpath(".//*[@class='badgeText']").text
                             print (reviews_count_str.split())
-                            user_data['reviews_count'] = int(reviews_count_str.split()[0])
+                            user_data['reviews_count'] = locale.atoi(reviews_count_str.split()[0])
                         else:
                             user_data['reviews_count'] = ''
                         hotel_reviews = user.find_elements_by_xpath(".//*[@class='contributionReviewBadge badge']")
                         if hotel_reviews:
                             hotel_reviews_str = hotel_reviews[0].find_element_by_xpath(".//*[@class='badgeText']").text
                             print (hotel_reviews_str.split())
-                            user_data['hotel_reviews'] = int(hotel_reviews_str.split()[0])
+                            user_data['hotel_reviews'] = locale.atoi(hotel_reviews_str.split()[0])
                         else:
                             user_data['hotel_reviews'] = ''
                         helpful_votes = user.find_elements_by_xpath(".//*[@class='helpfulVotesBadge badge']")
                         if helpful_votes:
                             helpful_votes_str = helpful_votes[0].find_element_by_xpath(".//*[@class='badgeText']").text
                             print (helpful_votes_str.split())
-                            user_data['helpful_votes'] = int(helpful_votes_str.split()[0])
+                            user_data['helpful_votes'] = locale.atoi(helpful_votes_str.split()[0])
                         else:
                             user_data['helpful_votes'] = ''
                     except Exception as inst:
