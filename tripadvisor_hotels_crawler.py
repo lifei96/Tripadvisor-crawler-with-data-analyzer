@@ -147,6 +147,15 @@ def crawl(driver, driver2, driver3, city_id, city_name, hotels_id_list):
         reviews_list = list()
         for page_num_int in range(page_num):
             try:
+                if page_num_int % 50 == 0:
+                    driver.quit()
+                    driver2.quit()
+                    driver3.quit()
+                    driver3 = webdriver.Chrome(executable_path='./chromedriver')
+                    driver2 = webdriver.Chrome(executable_path='./chromedriver')
+                    driver = webdriver.Chrome(executable_path='./chromedriver')
+                    print ("-----webdriver restarted")
+                    time.sleep(2)
                 print('-----page ' + str(page_num_int))
                 driver.get('https://www.tripadvisor.com/Hotel_Review-g' + city_id + '-d' + hotel_id + '-Reviews-or' + str(page_num_int) + '0')
                 time.sleep(5)
