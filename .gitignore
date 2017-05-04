@@ -2,6 +2,7 @@ Data/
 Figures/
 chromedriver
 geocoding_key.txt
+distance_key.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

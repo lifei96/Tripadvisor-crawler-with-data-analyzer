@@ -1,30 +1,7 @@
 function draw()
-    dataset = csvread('./Data/exclamation_income.csv', 1, 0);
-    mdl = fitlm(dataset(:, 1), dataset(:, 2));
-    disp(sprintf('\n\nexclamation_income_all_cities'));
+    [num,txt,raw] = xlsread('./Data/reviews_US_no formula.xlsx', 2, 1);
+    X = raw(:, [36 2 21 22 40 28]);
+    X = cell2mat(X);
+    mdl = fitlm(X, cell2mat(raw(:, 8)));
     disp(mdl);
-    
-    dataset = csvread('./Data/exclamation_merged_income.csv', 1, 0);
-    mdl = fitlm(dataset(:, 1), dataset(:, 2));
-    disp(sprintf('\n\nexclamation_merged_income_all_cities'));
-    disp(mdl);
-    
-    dataset = csvread('./Data/exclamation_income_New_York_City.csv', 1, 0);
-    mdl = fitlm(dataset(:, 1), dataset(:, 2));
-    disp(sprintf('\n\nexclamation_income_New_York_City'));
-    disp(mdl);
-    
-    dataset = csvread('./Data/exclamation_merged_income_New_York_City.csv', 1, 0);
-    mdl = fitlm(dataset(:, 1), dataset(:, 2));
-    disp(sprintf('\n\nexclamation_merged_income_New_York_City'));
-    disp(mdl);
-    
-    dataset = csvread('./Data/exclamation_income_Los_Angeles.csv', 1, 0);
-    mdl = fitlm(dataset(:, 1), dataset(:, 2));
-    disp(sprintf('\n\nexclamation_income_Los_Angeles'));
-    disp(mdl);
-    
-    dataset = csvread('./Data/exclamation_merged_income_Los_Angeles.csv', 1, 0);
-    mdl = fitlm(dataset(:, 1), dataset(:, 2));
-    disp(sprintf('\n\nexclamation_merged_income_Los_Angeles'));
-    disp(mdl);
+end
